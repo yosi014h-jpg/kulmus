@@ -1,0 +1,8 @@
+{
+  "appId": "il.kulmus.pdf",
+  "appName": "קולמוס PDF",
+  "webDir": "dist/android-web",
+  "android": {
+    "allowMixedContent": false
+  }
+}

@@ -337,6 +337,8 @@ async function pageInfo(p) {
     return { blank: true, rotation: r, viewW: sw, viewH: sh };
   }
   const src = S.sources.get(p.src);
+  // ציור שהתחיל לפני מעבר ללשונית אחרת — העמוד כבר לא מוצג
+  if (!src) throw Object.assign(new Error('stale page'), { stale: true });
   const pg = await src.pdf.getPage(p.index + 1);
   const rotation = (((pg.rotate + p.rotate) % 360) + 360) % 360;
   const vp = pg.getViewport({ scale: 1, rotation });
@@ -2787,6 +2789,19 @@ async function printDocument() {
   const d = D();
   if (!d || !d.pages.length || printing) return;
   printing = true;
+  if (api.printPdf) {
+    // אפליקציית אנדרואיד: שולחים את ה-PDF עצמו למערכת ההדפסה של הטלפון
+    try {
+      const bytes = await busy('מכין להדפסה…', () => buildBytes(S.pages));
+      await api.printPdf(bytes, d.title);
+    } catch (e) {
+      console.error(e);
+      toast('ההדפסה נכשלה: ' + (e.message || e), { error: true });
+    } finally {
+      printing = false;
+    }
+    return;
+  }
   const root = $('#print-root');
   root.textContent = '';
   try {
@@ -3380,7 +3395,8 @@ function wire() {
 (async function init() {
   window.__errs = [];
   window.addEventListener('error', (e) => window.__errs.push(String(e.message)));
-  window.addEventListener('unhandledrejection', (e) => window.__errs.push(String(e.reason && (e.reason.stack || e.reason.message) || e.reason)));
+  window.addEventListener('unhandledrejection', (e) => { if (e.reason && e.reason.stale) e.preventDefault(); });
+  window.addEventListener('unhandledrejection', (e) => (e.reason && e.reason.stale) || window.__errs.push(String(e.reason && (e.reason.stack || e.reason.message) || e.reason)));
   wire();
   const [regular, bold] = await Promise.all([api.readAsset('fonts/Alef-Regular.ttf'), api.readAsset('fonts/Alef-Bold.ttf')]);
   S.fonts = { regular, bold };

@@ -1,5 +1,5 @@
 # גרסת בדיקה: כל דחיפה לענף שאינו main בונה תוכנת התקנה — בלי לפרסם אותה.
-# ההורדה: לשונית Actions ← הריצה האחרונה ← Artifacts ← KulmusPDF-test (Windows) / KulmusPDF-test-mac (macOS)
+# ההורדה: לשונית Actions ← הריצה האחרונה ← Artifacts ← KulmusPDF-test (Windows) / KulmusPDF-test-android (אנדרואיד)
 name: Test build
 
 on:
@@ -36,8 +36,8 @@ jobs:
           retention-days: 14
           compression-level: 0
 
-  build-mac:
-    runs-on: macos-latest
+  build-android:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -46,19 +46,19 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Build test dmg
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Build test APK
         run: |
           npm ci
-          npm test
-          installer/build-mac.sh
-          VERSION=$(node -p "require('./package.json').version")
-          SHORT=$(git rev-parse --short HEAD)
-          mkdir -p out
-          cp "dist/KulmusPDF-$VERSION-mac.dmg" "out/KulmusPDF-$VERSION-test-$SHORT-mac.dmg"
+          npm run build:android
+          cd android && ./gradlew assembleRelease --no-daemon
 
       - uses: actions/upload-artifact@v4
         with:
-          name: KulmusPDF-test-mac
-          path: out/*.dmg
+          name: KulmusPDF-test-android
+          path: android/app/build/outputs/apk/release/*.apk
           retention-days: 14
-          compression-level: 0

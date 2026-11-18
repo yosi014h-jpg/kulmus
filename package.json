@@ -10,7 +10,8 @@
     "dist:arm64": "installer/build.sh arm64",
     "dist:mac": "installer/build-mac.sh",
     "build:web": "node scripts/build-web.js",
-    "serve:web": "node scripts/build-web.js && npx http-server dist/web -p 8080 -c-1"
+    "serve:web": "node scripts/build-web.js && npx http-server dist/web -p 8080 -c-1",
+    "build:android": "node scripts/build-web.js && node scripts/build-android-web.js && npx cap sync android"
   },
   "author": "קולמוס PDF",
   "license": "MIT",
@@ -24,10 +25,13 @@
     "pdfjs-dist": "^4.10.38"
   },
   "devDependencies": {
+    "@capacitor/cli": "^7.6.10",
+    "buffer": "^6.0.3",
     "electron": "^45.2.1",
     "electron-builder": "^26.18.0",
     "esbuild": "^0.25.0",
-    "buffer": "^6.0.3"
+    "@capacitor/core": "^7.6.10",
+    "@capacitor/android": "^7.6.10"
   },
   "productName": "קולמוס PDF",
   "build": {

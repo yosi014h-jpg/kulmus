@@ -67,7 +67,27 @@
   const PFX = { label: 'קובצי תעודה', ext: '.pfx,.p12,application/x-pkcs12' };
   const PFX_MIME = { 'application/x-pkcs12': ['.pfx', '.p12'] };
 
+  /* ---------- אפליקציית אנדרואיד: התוסף המקומי (ראו android/.../KulmusPlugin.java) ---------- */
+  const NATIVE = window.KulmusNative || null;
+  function toB64(u8) {
+    u8 = u8 instanceof Uint8Array ? u8 : new Uint8Array(u8);
+    let s = '';
+    for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000));
+    return btoa(s);
+  }
+  function fromB64(b64) {
+    const s = atob(b64);
+    const u8 = new Uint8Array(s.length);
+    for (let i = 0; i < s.length; i++) u8[i] = s.charCodeAt(i);
+    return u8;
+  }
+
   function download(name, bytes, type) {
+    if (NATIVE) {
+      // באנדרואיד אין "הורדה" מתוך האפליקציה — שומרים ישירות לתיקיית ההורדות
+      return NATIVE.saveFile({ name, mime: type || 'application/pdf', data: toB64(bytes) })
+        .catch((e) => console.error('שמירה נכשלה', e));
+    }
     const url = URL.createObjectURL(new Blob([bytes], { type: type || 'application/pdf' }));
     const a = document.createElement('a');
     a.href = url;
@@ -298,6 +318,8 @@
       while (queued.length) { const q = queued.shift(); openHandlers.forEach((cb) => cb(q)); }
     },
     pathForFile: (file) => register(file.name, { handle: null, file }),
+    /** באנדרואיד: הדפסה דרך מערכת ההדפסה של הטלפון (בדפדפן — undefined, והממשק משתמש ב-window.print) */
+    printPdf: NATIVE ? (bytes, name) => NATIVE.printPdf({ name: withPdf(name || 'מסמך'), data: toB64(bytes) }) : undefined,
     onOpenRequest: (cb) => openHandlers.push(cb),
     onMenu: (cb) => menuHandlers.push(cb),
     onBeforeClose: () => {},
@@ -312,6 +334,21 @@
       const req = { mode: paths.length > 1 ? 'merge' : 'open', paths };
       if (ready) openHandlers.forEach((cb) => cb(req)); else queued.push(req);
     });
+  }
+
+  // אנדרואיד: קבצי PDF שנפתחו מאפליקציה אחרת ("פתח באמצעות" / "שיתוף")
+  if (NATIVE) {
+    const pull = async () => {
+      try {
+        const { files } = await NATIVE.takePending();
+        if (!files || !files.length) return;
+        const paths = files.map((f) => register(f.name, { handle: null, file: new File([fromB64(f.data)], f.name, { type: 'application/pdf' }) }));
+        const req = { mode: paths.length > 1 ? 'merge' : 'open', paths };
+        if (ready) openHandlers.forEach((cb) => cb(req)); else queued.push(req);
+      } catch (e) { console.error(e); }
+    };
+    NATIVE.addListener('incoming', pull);
+    pull();
   }
 
   window.api = api;

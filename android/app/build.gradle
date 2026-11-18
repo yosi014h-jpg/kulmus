@@ -1,0 +1,69 @@
+apply plugin: 'com.android.application'
+
+// מספר הגרסה נלקח מ-package.json (1.3.0 → versionCode 10300)
+def pkg = new groovy.json.JsonSlurper().parse(file('../../package.json'))
+def ver = pkg.version.tokenize('.').collect { it as int }
+
+android {
+    namespace "il.kulmus.pdf"
+    compileSdk rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "il.kulmus.pdf"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode ver[0] * 10000 + ver[1] * 100 + ver[2]
+        versionName pkg.version
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    // חתימה קבועה, כדי שגרסה חדשה תותקן מעל הקודמת.
+    // אפשר להחליף במפתח פרטי דרך משתני הסביבה KULMUS_KEYSTORE / KULMUS_KEYSTORE_PASSWORD.
+    signingConfigs {
+        release {
+            storeFile file(System.getenv('KULMUS_KEYSTORE') ?: '../kulmus-release.jks')
+            storePassword System.getenv('KULMUS_KEYSTORE_PASSWORD') ?: 'kulmus-pdf'
+            keyAlias System.getenv('KULMUS_KEY_ALIAS') ?: 'kulmus'
+            keyPassword System.getenv('KULMUS_KEYSTORE_PASSWORD') ?: 'kulmus-pdf'
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}

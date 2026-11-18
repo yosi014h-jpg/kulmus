@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">קולמוס PDF</string>
+    <string name="title_activity_main">קולמוס PDF</string>
+    <string name="package_name">il.kulmus.pdf</string>
+    <string name="custom_url_scheme">il.kulmus.pdf</string>
+</resources>

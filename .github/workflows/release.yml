@@ -1,7 +1,7 @@
 # בונה את תוכנת ההתקנה ומפרסם אותה ב-Releases בכל פעם שמספר הגרסה ב-package.json משתנה.
 # הקישורים הקבועים להורדה של הגרסה האחרונה:
 #   https://github.com/yosi014h-jpg/kulmus/releases/latest/download/KulmusPDF-Setup-x64.exe
-#   https://github.com/yosi014h-jpg/kulmus/releases/latest/download/KulmusPDF-mac.dmg
+#   https://github.com/yosi014h-jpg/kulmus/releases/latest/download/KulmusPDF.apk
 name: Release
 
 on:
@@ -61,12 +61,11 @@ jobs:
             dist/KulmusPDF-Setup-x64.exe
             dist/KulmusPDF-Setup-${{ steps.v.outputs.version }}-x64.exe
 
-  # גרסת macOS — נבנית על מחשב Mac של GitHub ומתווספת לאותו Release.
-  # חתימה ואישור של Apple מופעלים רק אם הוגדרו הסודות (ראו installer/build-mac.sh).
-  build-mac:
+  # אפליקציית אנדרואיד (APK) — נבנית אחרי Windows ומתווספת לאותו Release.
+  build-android:
     needs: build
     if: needs.build.outputs.exists == 'false'
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -75,23 +74,24 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Build dmg
-        env:
-          CSC_LINK: ${{ secrets.MAC_CSC_LINK }}
-          CSC_KEY_PASSWORD: ${{ secrets.MAC_CSC_KEY_PASSWORD }}
-          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
-          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
-          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Build APK
         run: |
           npm ci
-          npm test
-          installer/build-mac.sh
-          cp "dist/KulmusPDF-${{ needs.build.outputs.version }}-mac.dmg" dist/KulmusPDF-mac.dmg
+          npm run build:android
+          cd android && ./gradlew assembleRelease --no-daemon
+          cd ..
+          cp android/app/build/outputs/apk/release/app-release.apk dist/KulmusPDF.apk
+          cp android/app/build/outputs/apk/release/app-release.apk "dist/KulmusPDF-${{ needs.build.outputs.version }}.apk"
 
       - name: Add to release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ needs.build.outputs.version }}
           files: |
-            dist/KulmusPDF-mac.dmg
-            dist/KulmusPDF-${{ needs.build.outputs.version }}-mac.dmg
+            dist/KulmusPDF.apk
+            dist/KulmusPDF-${{ needs.build.outputs.version }}.apk
