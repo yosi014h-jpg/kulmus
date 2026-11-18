@@ -5,6 +5,7 @@
 ## להורדה ולשימוש
 
 - **התקנה ל-Windows (בלי אינטרנט ובלי דפדפן):** [הורדת קולמוס PDF](https://github.com/yosi014h-jpg/kulmus/releases/latest/download/KulmusPDF-Setup-x64.exe)
+- **אפליקציה לאנדרואיד:** [הורדת KulmusPDF.apk](https://github.com/yosi014h-jpg/kulmus/releases/latest/download/KulmusPDF.apk)
 - **שימוש בדפדפן, בטלפון או במחשב:** https://yosi014h-jpg.github.io/kulmus/
 
 ## מה היא עושה
