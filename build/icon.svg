@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#D32F2F"/><stop offset="1" stop-color="#7A1010"/></linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFC94A"/><stop offset="1" stop-color="#F0A01A"/></linearGradient>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#2A0505" flood-opacity=".45"/></filter>
+    <filter id="sh2" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#2A0505" flood-opacity=".35"/></filter>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <!-- דף -->
+  <g filter="url(#sh2)">
+    <path d="M128 74h176l80 80v262a22 22 0 0 1-22 22H128a22 22 0 0 1-22-22V96a22 22 0 0 1 22-22z" fill="#fff"/>
+    <path d="M304 74v58a22 22 0 0 0 22 22h58z" fill="#E6D3D0"/>
+  </g>
+  <!-- ציפורן קולמוס -->
+  <g transform="rotate(-32 236 214)">
+    <path d="M236 98c28 30 46 64 46 96 0 30-16 58-46 96-30-38-46-66-46-96 0-32 18-66 46-96z" fill="#8B1A1A"/>
+    <circle cx="236" cy="190" r="13" fill="#fff"/>
+    <path d="M236 203v84" stroke="#fff" stroke-width="7" stroke-linecap="round"/>
+  </g>
+  <!-- תווית PDF קופצת מהדף -->
+  <g transform="rotate(-9 330 360)" filter="url(#sh)">
+    <rect x="196" y="300" width="276" height="122" rx="26" fill="url(#gold)"/>
+    <rect x="196" y="300" width="276" height="122" rx="26" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="5"/>
+    <text x="334" y="392" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-weight="900" font-size="96" letter-spacing="2" fill="#8B1A1A">PDF</text>
+  </g>
+</svg>

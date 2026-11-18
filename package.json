@@ -1,0 +1,119 @@
+{
+  "name": "pdf-ivrit",
+  "version": "1.2.2",
+  "description": "קולמוס PDF — תוכנה חינמית ומקומית לעבודה עם PDF בעברית",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node test/run-tests.js",
+    "dist": "installer/build.sh x64",
+    "dist:arm64": "installer/build.sh arm64",
+    "dist:mac": "installer/build-mac.sh",
+    "build:web": "node scripts/build-web.js",
+    "serve:web": "node scripts/build-web.js && npx http-server dist/web -p 8080 -c-1"
+  },
+  "author": "קולמוס PDF",
+  "license": "MIT",
+  "dependencies": {
+    "@pdf-lib/fontkit": "npm:@cantoo/fontkit@^2.0.12",
+    "@signpdf/signpdf": "^3.4.0",
+    "@signpdf/utils": "^3.4.0",
+    "bidi-js": "^1.1.0",
+    "node-forge": "^1.4.2",
+    "pdf-lib": "npm:@cantoo/pdf-lib@^2.11.1",
+    "pdfjs-dist": "^4.10.38"
+  },
+  "devDependencies": {
+    "electron": "^45.2.1",
+    "electron-builder": "^26.18.0",
+    "esbuild": "^0.25.0",
+    "buffer": "^6.0.3"
+  },
+  "productName": "קולמוס PDF",
+  "build": {
+    "appId": "il.kulmus.pdf",
+    "productName": "קולמוס PDF",
+    "artifactName": "KulmusPDF-${version}-${arch}.${ext}",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "build/icon.png",
+      "src/**/*",
+      "assets/**/*",
+      "!node_modules/pdfjs-dist/legacy/**",
+      "!node_modules/pdfjs-dist/types/**",
+      "!node_modules/pdfjs-dist/web/**",
+      "!**/*.map",
+      "!node_modules/@napi-rs/**",
+      "!node_modules/pdfjs-dist/image_decoders/**",
+      "!src/web/**"
+    ],
+    "fileAssociations": [],
+    "win": {
+      "target": [
+        {
+          "target": "dir",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "executableName": "KulmusPDF",
+      "extraResources": [
+        {
+          "from": "native/thumbs/dist",
+          "to": "native/thumbs",
+          "filter": [
+            "*.dll",
+            "LICENSE*"
+          ]
+        },
+        {
+          "from": "native/thumbs/dist-arm64",
+          "to": "native/thumbs-arm64",
+          "filter": [
+            "*.dll",
+            "LICENSE*"
+          ]
+        }
+      ]
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "universal"
+          ]
+        }
+      ],
+      "artifactName": "KulmusPDF-${version}-mac.${ext}",
+      "icon": "build/logo-full.png",
+      "category": "public.app-category.productivity",
+      "hardenedRuntime": true,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "fileAssociations": [
+        {
+          "ext": "pdf",
+          "name": "PDF",
+          "role": "Viewer",
+          "rank": "Alternate"
+        }
+      ]
+    },
+    "dmg": {
+      "title": "KulmusPDF ${version}",
+      "writeUpdateInfo": false
+    },
+    "electronLanguages": [
+      "he",
+      "en-US"
+    ]
+  }
+}

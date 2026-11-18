@@ -1,0 +1,33 @@
+// גשר מצומצם ובטוח בין הממשק לבין מערכת הקבצים
+const { contextBridge, ipcRenderer, webUtils } = require('electron');
+
+contextBridge.exposeInMainWorld('api', {
+  platform: process.platform,
+  openPdfs: () => ipcRenderer.invoke('open-pdfs'),
+  openImages: () => ipcRenderer.invoke('open-images'),
+  readFile: (p) => ipcRenderer.invoke('read-file', p),
+  writeFile: (target, bytes) => ipcRenderer.invoke('write-file', { target, bytes }),
+  saveAs: (defaultName, bytes, near) => ipcRenderer.invoke('save-as', { defaultName, bytes, near }),
+  chooseFolder: (title) => ipcRenderer.invoke('choose-folder', title),
+  writeFiles: (folder, files) => ipcRenderer.invoke('write-files', { folder, files }),
+  readAsset: (rel) => ipcRenderer.invoke('read-asset', rel),
+  showInFolder: (p) => ipcRenderer.invoke('show-in-folder', p),
+  openPath: (p) => ipcRenderer.invoke('open-path', p),
+  appVersion: () => ipcRenderer.invoke('app-version'),
+  integrationStatus: () => ipcRenderer.invoke('integration-status'),
+  integrationSet: (key, on) => ipcRenderer.invoke('integration-set', { key, on }),
+  certsSupported: () => ipcRenderer.invoke('certs-supported'),
+  certsList: () => ipcRenderer.invoke('certs-list'),
+  pickPfx: () => ipcRenderer.invoke('pick-pfx'),
+  certInfo: (source) => ipcRenderer.invoke('cert-info', source),
+  certCreate: (opts) => ipcRenderer.invoke('cert-create', opts),
+  digitalSign: (req) => ipcRenderer.invoke('digital-sign', req),
+  verifySignatures: (bytes) => ipcRenderer.invoke('verify-signatures', bytes),
+  setDirty: (v) => ipcRenderer.send('set-dirty', v),
+  closeNow: () => ipcRenderer.send('close-now'),
+  rendererReady: () => ipcRenderer.send('renderer-ready'),
+  pathForFile: (file) => (webUtils && webUtils.getPathForFile ? webUtils.getPathForFile(file) : file.path),
+  onOpenRequest: (cb) => ipcRenderer.on('open-request', (_e, req) => cb(req)),
+  onMenu: (cb) => ipcRenderer.on('menu', (_e, cmd) => cb(cmd)),
+  onBeforeClose: (cb) => ipcRenderer.on('before-close', () => cb()),
+});

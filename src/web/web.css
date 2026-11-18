@@ -1,0 +1,48 @@
+/* תוספות לגרסת הדפדפן בלבד: כפתור אודות ופריסה לטלפון */
+.about-btn {
+  width: 34px; height: 34px;
+  display: inline-grid; place-items: center;
+  border: 0; border-radius: 9px; background: none; color: var(--ink-3);
+}
+.about-btn:hover { background: var(--panel); color: var(--ink); }
+.about-btn svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+
+/* טלפון וטאבלט צר: מסמך למעלה, אפשרויות מתחת, כלים בשורה בתחתית */
+@media (max-width: 760px) {
+  .topbar { gap: 8px; padding: 0 8px; }
+  .brand { border: 0; padding: 0; }
+  .views, .ctl-sep { display: none !important; }
+  .zoom-val { min-width: 36px; }
+
+  .workspace,
+  body.no-panel .workspace {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto auto;
+    grid-template-areas: "desk" "panel" "rail";
+  }
+  .desk { grid-area: desk; }
+  .panel {
+    grid-area: panel;
+    max-height: 42vh;
+    border-inline-start: 0;
+    border-top: 1px solid var(--line);
+    padding: 14px 14px 18px;
+    gap: 16px;
+  }
+  .rail {
+    grid-area: rail;
+    flex-direction: row;
+    border-inline-end: 0;
+    border-top: 1px solid var(--line);
+    padding: 4px 6px calc(4px + env(safe-area-inset-bottom));
+    overflow-x: auto; overflow-y: hidden;
+    scrollbar-width: none;
+  }
+  .rail::-webkit-scrollbar { display: none; }
+  .rail-group { flex-direction: row; gap: 2px; }
+  .rail-btn { min-width: 66px; padding: 6px 4px; font-size: 11px; }
+  .rail-btn[aria-pressed="true"]::before { display: none; }
+
+  .empty h1 { font-size: 22px; }
+  .modal { max-height: 92vh; overflow-y: auto; }
+}

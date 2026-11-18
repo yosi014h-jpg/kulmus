@@ -1,0 +1,899 @@
+/* ===== גופנים (מקומיים, בלי אינטרנט) ===== */
+@font-face { font-family: 'Plex'; src: url('../../assets/fonts/IBMPlexSansHebrew-Regular.ttf'); font-weight: 400; }
+@font-face { font-family: 'Plex'; src: url('../../assets/fonts/IBMPlexSansHebrew-Medium.ttf'); font-weight: 500; }
+@font-face { font-family: 'Plex'; src: url('../../assets/fonts/IBMPlexSansHebrew-SemiBold.ttf'); font-weight: 600; }
+@font-face { font-family: 'Plex'; src: url('../../assets/fonts/IBMPlexSansHebrew-Bold.ttf'); font-weight: 700; }
+@font-face { font-family: 'Alef'; src: url('../../assets/fonts/Alef-Regular.ttf'); font-weight: 400; }
+@font-face { font-family: 'Alef'; src: url('../../assets/fonts/Alef-Bold.ttf'); font-weight: 700; }
+
+/* ===== טוקנים ===== */
+:root {
+  color-scheme: light;
+  /* שפה עיצובית לפי הלוגו: אדום עמוק, זהב כהדגשה יחידה, דף לבן */
+  --navy: #8B1A1A;          /* סרגל עליון — האדום העמוק של הלוגו */
+  --navy-deep: #6B1010;
+  --navy-line: #A8322B;
+  --gold: #F5B227;          /* הסרט הזהוב — שמירה וסימון הכלי הפעיל בלבד */
+  --gold-deep: #D98A0B;
+  --desk: #ECE3E1;          /* שולחן העבודה — אפור חמים, שהדפים הלבנים יבלטו עליו */
+  --desk-deep: #DCCDCA;
+  --paper: #FFFFFF;
+  --panel: #FBF7F6;
+  --line: #E2D3D0;
+  --line-soft: #F1E8E6;
+  --ink: #2A1716;           /* טקסט */
+  --ink-2: #6A4D4A;
+  --ink-3: #9A7F7B;
+  --ink-blue: #C62828;      /* אדום הלוגו — פעולה ראשית, חתימות, בחירה */
+  --ink-blue-deep: #A01D1D;
+  --ink-blue-wash: #FCE8E7;
+  --stamp: #8E2412;         /* חותמת — מחיקה בלבד */
+  --stamp-wash: #F6E1DA;
+  --ok: #2F7D5B;
+
+  --r-paper: 2px;
+  --r-ctl: 8px;
+  --r-pop: 12px;
+
+  --shadow-paper: 0 1px 1px rgba(70, 14, 12, .10), 0 6px 14px -6px rgba(70, 14, 12, .30);
+  --shadow-lift: 0 2px 4px rgba(70, 14, 12, .12), 0 18px 32px -12px rgba(70, 14, 12, .40);
+  --shadow-pop: 0 10px 40px -10px rgba(70, 14, 12, .38), 0 0 0 1px rgba(70, 14, 12, .06);
+
+  --fs-xs: 12px;
+  --fs-s: 13px;
+  --fs-m: 14px;
+  --fs-l: 17px;
+  --fs-xl: 26px;
+
+  --panel-w: 300px;
+  --thumb-w: 168px;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  font-family: 'Plex', 'Segoe UI', system-ui, sans-serif;
+  font-size: var(--fs-m);
+  line-height: 1.5;
+  color: var(--ink);
+  background: var(--desk);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+input, textarea, select, button { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--ink-blue); outline-offset: 2px; }
+[hidden] { display: none !important; }
+svg { flex: none; }
+
+/* ===== סרגל עליון: נקי ובהיר, רק לשוניות + תצוגה ושמירה ===== */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 50px;
+  padding: 0 14px 0 12px;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 1px 0 rgba(70, 14, 12, .03), 0 4px 12px -10px rgba(70, 14, 12, .25);
+  position: relative;
+  z-index: 5;
+}
+.brand {
+  display: flex; align-items: center; gap: 8px; flex: none;
+  color: var(--ink);
+  padding-inline-end: 14px;
+  border-inline-end: 1px solid var(--line-soft);
+  height: 28px;
+}
+.brand-logo { width: 26px; height: 26px; display: block; }
+.brand-name { font-size: 15.5px; font-weight: 700; letter-spacing: 0; white-space: nowrap; display: flex; align-items: baseline; }
+.brand-name .pdf { color: var(--ink-blue); }
+
+/* לשוניות קבצים */
+.tabs {
+  flex: 1; min-width: 0; height: 100%;
+  display: flex; align-items: center; gap: 4px;
+  overflow-x: auto; overflow-y: hidden; scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  position: relative;
+  display: flex; align-items: center;
+  height: 34px; min-width: 110px; max-width: 240px; flex: 0 1 auto;
+  border-radius: 8px;
+  color: var(--ink-2);
+  transition: background-color .12s, color .12s;
+}
+.tab:hover { background: var(--panel); color: var(--ink); }
+.tab.on { background: var(--ink-blue-wash); color: var(--ink-blue-deep); }
+.tab + .tab:not(.on):not(:hover)::before {
+  content: ''; position: absolute; inset-inline-start: -3px; top: 9px; bottom: 9px;
+  border-inline-start: 1px solid var(--line-soft);
+}
+.tab.on + .tab::before, .tab:hover + .tab::before { display: none; }
+.tab-name {
+  flex: 1; min-width: 0; height: 100%;
+  display: flex; align-items: center; gap: 7px;
+  border: 0; background: none; padding: 0 10px 0 2px;
+  font-weight: 500; font-size: 13.5px; text-align: start; color: inherit;
+}
+.tab-name svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; opacity: .75; }
+.tab.on .tab-name { font-weight: 600; cursor: default; }
+.tab.on .tab-name svg { opacity: 1; }
+.tab-text { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.tab .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gold-deep); flex: none; }
+.tab-x {
+  width: 22px; height: 22px; margin-inline-end: 6px; flex: none;
+  display: grid; place-items: center; border: 0; border-radius: 6px; background: none; color: var(--ink-3);
+  opacity: 0; transition: opacity .12s;
+}
+.tab:hover .tab-x, .tab.on .tab-x, .tab-x:focus-visible { opacity: 1; }
+.tab-x svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.tab-x:hover { background: rgba(70, 14, 12, .08); color: var(--ink); }
+
+/* פקדים בצד השמאלי: תצוגה ושמירה */
+.top-actions { margin-inline-start: auto; display: flex; align-items: center; gap: 10px; flex: none; }
+.view-ctl { display: flex; align-items: center; gap: 8px; }
+.ctl-group {
+  display: flex; align-items: center; gap: 1px;
+  padding: 2px; border-radius: 9px;
+  background: var(--panel); box-shadow: inset 0 0 0 1px var(--line-soft);
+}
+.ctl-group .icon-btn { width: 32px; height: 30px; border-radius: 7px; color: var(--ink-2); }
+.ctl-group .icon-btn svg { width: 18px; height: 18px; }
+.ctl-group .icon-btn:hover:not(:disabled) { background: rgba(70, 14, 12, .06); color: var(--ink); }
+.ctl-group .icon-btn.on { background: var(--paper); color: var(--ink-blue); box-shadow: 0 1px 2px rgba(70, 14, 12, .16), 0 0 0 1px rgba(70, 14, 12, .05); }
+.ctl-group .icon-btn:disabled { opacity: .3; }
+.ctl-sep { width: 1px; height: 18px; background: var(--line); margin: 0 3px; }
+.zoom-val { min-width: 44px; text-align: center; font-size: var(--fs-s); font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ink); }
+
+.save-btn {
+  position: relative;
+  width: 38px; height: 34px;
+  display: inline-grid; place-items: center;
+  border: 0; border-radius: 9px;
+  background: var(--ink-blue); color: #fff;
+  box-shadow: 0 1px 2px rgba(70, 14, 12, .25);
+  transition: background-color .12s;
+}
+.save-btn svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.save-btn:hover:not(:disabled) { background: var(--ink-blue-deep); }
+.save-btn:disabled { background: var(--line-soft); color: var(--ink-3); box-shadow: none; cursor: default; }
+.save-btn.dirty::after {
+  content: ''; position: absolute; top: -3px; inset-inline-end: -3px;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--gold); box-shadow: 0 0 0 2px var(--paper);
+}
+
+/* ===== כפתורים ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: var(--r-ctl);
+  border: 1px solid var(--line);
+  background: var(--paper);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.btn:hover { border-color: var(--ink-3); }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.btn-primary { background: var(--ink-blue); border-color: var(--ink-blue); color: #fff; font-weight: 600; }
+.btn-primary:hover:not(:disabled) { background: var(--ink-blue-deep); border-color: var(--ink-blue-deep); }
+.btn-quiet { background: transparent; border-color: transparent; color: var(--ink-2); }
+.btn-quiet:hover { background: var(--line-soft); border-color: transparent; color: var(--ink); }
+.btn-danger { color: var(--stamp); }
+.btn-danger:hover:not(:disabled) { background: var(--stamp-wash); border-color: var(--stamp); }
+.btn-block { width: 100%; }
+.btn-lg { height: 44px; font-size: 15px; padding: 0 20px; }
+
+.icon-btn {
+  width: 34px; height: 34px;
+  display: inline-grid; place-items: center;
+  border: 0; border-radius: var(--r-ctl);
+  background: none; color: var(--ink-2);
+}
+.icon-btn:hover:not(:disabled) { background: var(--line-soft); color: var(--ink); }
+.icon-btn:disabled { opacity: .35; cursor: default; }
+.icon-btn svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ===== אזור עבודה ===== */
+.workspace { display: grid; grid-template-columns: 84px 1fr var(--panel-w); min-height: 0; }
+body.no-panel .workspace { grid-template-columns: 84px 1fr 0; }
+body.no-panel .panel { display: none; }
+.panel {
+  background: var(--panel);
+  border-inline-start: 1px solid var(--line);
+  overflow-y: auto;
+  padding: 20px 18px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.desk { position: relative; overflow: auto; min-width: 0; outline: none; }
+
+/* קבוצות בלוח הצד */
+.group { display: flex; flex-direction: column; gap: 10px; }
+.group + .group { padding-top: 20px; border-top: 1px solid var(--line-soft); }
+.group h2 { margin: 0; font-size: var(--fs-m); font-weight: 600; color: var(--ink); }
+.group p.hint { margin: 0; font-size: var(--fs-s); color: var(--ink-2); line-height: 1.55; }
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-row .btn { flex: 1 1 auto; }
+
+.tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.tool {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+  padding: 12px 12px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-ctl);
+  background: var(--paper);
+  text-align: start;
+  font-weight: 500;
+}
+.tool svg { width: 22px; height: 22px; fill: none; stroke: var(--ink-2); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.tool:hover { border-color: var(--ink-3); }
+.tool-grid > .tool:last-child:nth-child(odd) { grid-column: 1 / -1; flex-direction: row; align-items: center; gap: 10px; }
+.tool[aria-pressed="true"] { border-color: var(--ink-blue); background: var(--ink-blue-wash); color: var(--ink-blue-deep); }
+.tool[aria-pressed="true"] svg { stroke: var(--ink-blue); }
+.tool small { font-size: var(--fs-xs); color: var(--ink-3); font-weight: 400; }
+
+/* שדות */
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field > span { font-size: var(--fs-s); color: var(--ink-2); font-weight: 500; }
+.input, .select, textarea.input {
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-ctl);
+  background: var(--paper);
+  width: 100%;
+  user-select: text;
+}
+textarea.input { height: auto; padding: 8px 10px; resize: vertical; line-height: 1.45; }
+.input:focus, .select:focus { border-color: var(--ink-blue); outline: none; box-shadow: 0 0 0 3px var(--ink-blue-wash); }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.check { display: flex; align-items: flex-start; gap: 9px; cursor: pointer; font-size: var(--fs-m); line-height: 1.4; }
+.check input { width: 17px; height: 17px; margin: 1px 0 0; accent-color: var(--ink-blue); flex: none; }
+.check small { display: block; color: var(--ink-3); font-size: var(--fs-xs); margin-top: 2px; }
+
+.segmented { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; background: var(--line-soft); padding: 3px; border-radius: var(--r-ctl); gap: 2px; }
+.segmented button { border: 0; background: none; height: 30px; border-radius: 6px; font-size: var(--fs-s); font-weight: 500; color: var(--ink-2); }
+.segmented button[aria-pressed="true"] { background: var(--paper); color: var(--ink); box-shadow: 0 1px 2px rgba(27,36,48,.15); }
+
+.radio-list { display: flex; flex-direction: column; gap: 2px; }
+.radio-list label {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 9px 10px; border-radius: var(--r-ctl); cursor: pointer;
+}
+.radio-list label:hover { background: var(--line-soft); }
+.radio-list input { accent-color: var(--ink-blue); margin: 3px 0 0; }
+.radio-list b { font-weight: 500; display: block; }
+.radio-list small { color: var(--ink-3); font-size: var(--fs-xs); }
+
+.swatches { display: flex; gap: 8px; }
+.swatch { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--paper); box-shadow: 0 0 0 1px var(--line); padding: 0; }
+.swatch[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--ink); }
+
+/* רשימת קבצים בלוח הצד */
+.files { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.file {
+  display: grid;
+  grid-template-columns: 6px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px 8px 4px;
+  background: var(--paper);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-ctl);
+}
+.file-tab { width: 6px; height: 30px; border-radius: 3px; background: var(--c); }
+.file-name { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: rtl; }
+.file-meta { font-size: var(--fs-xs); color: var(--ink-3); }
+.file .icon-btn { width: 28px; height: 28px; }
+.file .icon-btn:hover { color: var(--stamp); background: var(--stamp-wash); }
+
+.stat-line { font-size: var(--fs-s); color: var(--ink-2); }
+.stat-line strong { color: var(--ink); font-weight: 600; }
+
+/* ===== מסך פתיחה ריק ===== */
+.empty {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 48px 24px;
+}
+.empty-inner { display: grid; justify-items: center; gap: 22px; text-align: center; max-width: 520px; }
+.empty-stack { position: relative; width: 190px; height: 210px; margin-bottom: 6px; }
+.empty-stack .sheet-ghost {
+  position: absolute; inset: 0 25px 0 25px;
+  background: var(--paper); border-radius: var(--r-paper);
+  box-shadow: var(--shadow-paper);
+}
+.empty-stack .sheet-ghost:nth-child(1) { transform: rotate(-7deg) translate(-14px, 8px); background: #F0F3F1; }
+.empty-stack .sheet-ghost:nth-child(2) { transform: rotate(4deg) translate(12px, 4px); background: #F7F9F8; }
+.empty-stack .sheet-ghost:nth-child(3) { padding: 26px 20px; display: flex; flex-direction: column; gap: 9px; align-items: flex-start; }
+.ghost-line { height: 6px; border-radius: 3px; background: var(--line-soft); width: 100%; }
+.ghost-line.s { width: 62%; }
+.ghost-line.m { width: 84%; }
+.ghost-sign { margin-top: auto; align-self: flex-end; width: 82px; height: 34px; }
+.ghost-sign path { fill: none; stroke: var(--ink-blue); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: 220; stroke-dashoffset: 220; animation: sign 1.6s .3s ease-out forwards; }
+@keyframes sign { to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) { .ghost-sign path { animation: none; stroke-dashoffset: 0; } }
+.empty h1 { margin: 0; font-size: var(--fs-xl); font-weight: 600; line-height: 1.25; }
+.empty p { margin: 0; color: var(--ink-2); font-size: 15px; line-height: 1.6; }
+.empty .btn-row { justify-content: center; }
+.empty .btn-row .btn { flex: 0 0 auto; }
+.empty-note { font-size: var(--fs-s) !important; color: var(--ink-3) !important; }
+
+/* ===== רשת עמודים (ארגון/פיצול) ===== */
+.desk-bar {
+  position: sticky; top: 0; z-index: 3;
+  display: flex; align-items: center; gap: 14px;
+  padding: 10px 24px;
+  background: color-mix(in srgb, var(--desk) 88%, transparent);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--desk-deep);
+  font-size: var(--fs-s); color: var(--ink-2);
+}
+.desk-bar .spacer { flex: 1; }
+.desk-bar label { display: flex; align-items: center; gap: 8px; }
+.desk-bar input[type=range] { width: 120px; accent-color: var(--ink-blue); }
+.sel-actions { display: flex; gap: 6px; align-items: center; }
+.sel-actions .btn { height: 30px; padding: 0 10px; font-size: var(--fs-s); }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--thumb-w), 1fr));
+  gap: 30px 26px;
+  padding: 28px 28px 80px;
+  align-items: end;
+}
+.sheet {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  cursor: default;
+  outline: none;
+}
+.paper {
+  position: relative;
+  background: var(--paper);
+  border-radius: var(--r-paper);
+  box-shadow: var(--shadow-paper);
+  line-height: 0;
+  transition: box-shadow .15s, transform .15s;
+  max-width: 100%;
+}
+.paper canvas { display: block; max-width: 100%; height: auto; border-radius: var(--r-paper); }
+.paper .loading { display: block; background: repeating-linear-gradient(-45deg, #fff 0 8px, #F3F5F4 8px 16px); border-radius: var(--r-paper); }
+/* לשונית הקובץ — מאיזה קובץ הגיע העמוד */
+.paper::before {
+  content: '';
+  position: absolute;
+  top: -5px; inset-inline-start: 14px;
+  width: 26px; height: 9px;
+  border-radius: 3px 3px 0 0;
+  background: var(--c, transparent);
+}
+.sheet:hover .paper { box-shadow: var(--shadow-lift); }
+.sheet.selected .paper { box-shadow: 0 0 0 3px var(--ink-blue), var(--shadow-lift); }
+.sheet:focus-visible .paper { box-shadow: 0 0 0 3px var(--ink-blue), var(--shadow-lift); }
+.sheet.dragging { opacity: .35; }
+.sheet.drop-before::after, .sheet.drop-after::after {
+  content: ''; position: absolute; top: 0; bottom: 26px; width: 3px; border-radius: 2px; background: var(--ink-blue);
+}
+.sheet.drop-before::after { inset-inline-start: -15px; }
+.sheet.drop-after::after { inset-inline-end: -15px; }
+
+.sheet-meta { display: flex; align-items: baseline; gap: 8px; font-size: var(--fs-xs); color: var(--ink-2); max-width: 100%; }
+.sheet-num { font-weight: 600; color: var(--ink); font-size: var(--fs-s); }
+.sheet-from { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+.sheet-tools {
+  position: absolute; top: 8px; inset-inline-end: 8px;
+  display: flex; gap: 2px; padding: 3px;
+  background: rgba(255,255,255,.96);
+  border-radius: var(--r-ctl);
+  box-shadow: 0 2px 8px rgba(27,36,48,.22);
+  opacity: 0; transform: translateY(-3px);
+  transition: opacity .12s, transform .12s;
+  line-height: 1;
+}
+.sheet:hover .sheet-tools, .sheet:focus-within .sheet-tools { opacity: 1; transform: none; }
+.sheet-tools .icon-btn { width: 28px; height: 28px; }
+.sheet-tools .icon-btn svg { width: 16px; height: 16px; }
+.sheet-tools .icon-btn.del:hover { color: var(--stamp); background: var(--stamp-wash); }
+
+/* פיצול: קבוצות */
+.split-groups { padding: 24px 28px 80px; display: flex; flex-direction: column; gap: 22px; }
+.split-group {
+  border: 1.5px dashed var(--g);
+  border-radius: var(--r-pop);
+  background: color-mix(in srgb, var(--g) 7%, transparent);
+  padding: 14px 18px 20px;
+}
+.split-group header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; }
+.split-group header b { font-weight: 600; color: var(--ink); }
+.split-group header span { color: var(--ink-2); font-size: var(--fs-s); }
+.split-group .grid { padding: 6px 0 0; gap: 22px 22px; }
+.manual-grid { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 22px 0; padding: 28px 28px 80px; }
+.manual-grid .sheet { width: var(--thumb-w); }
+.cut {
+  width: 34px; align-self: stretch;
+  display: grid; place-items: center;
+  border: 0; background: none; color: var(--ink-3);
+  position: relative;
+}
+.cut::before { content: ''; position: absolute; top: 4px; bottom: 30px; width: 0; border-inline-start: 2px dashed transparent; }
+.cut svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; position: relative; background: var(--desk); border-radius: 50%; padding: 1px; margin-bottom: 26px; }
+.cut:hover { color: var(--ink-blue); }
+.cut:hover::before { border-color: var(--ink-3); }
+.cut.on { color: var(--stamp); }
+.cut.on::before { border-color: var(--stamp); }
+
+/* ===== מצב חתימה ומילוי ===== */
+.pages-column { display: flex; flex-direction: column; align-items: center; gap: 28px; padding: 28px 24px 120px; }
+.page-frame { position: relative; background: var(--paper); box-shadow: var(--shadow-paper); border-radius: var(--r-paper); }
+.page-frame canvas { display: block; border-radius: var(--r-paper); }
+.page-frame .page-label {
+  position: absolute; top: 0; inset-inline-start: calc(100% + 12px);
+  font-size: var(--fs-xs); color: var(--ink-2); white-space: nowrap; line-height: 1.3;
+}
+.overlay { position: absolute; inset: 0; }
+.overlay.placing { cursor: crosshair; }
+.overlay.placing::after {
+  content: ''; position: absolute; inset: 0; border-radius: var(--r-paper);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ink-blue) 45%, transparent);
+  pointer-events: none;
+}
+
+.item { position: absolute; border: 1px dashed transparent; border-radius: 3px; }
+.item:hover { border-color: color-mix(in srgb, var(--ink-blue) 50%, transparent); }
+.item.active { border-color: var(--ink-blue); border-style: solid; }
+.item img { display: block; width: 100%; height: 100%; pointer-events: none; }
+.item .rect-fill { width: 100%; height: 100%; }
+.item textarea {
+  display: block; width: 100%;
+  border: 0; outline: none; resize: none; overflow: hidden;
+  background: transparent; padding: 0; margin: 0;
+  font-family: 'Alef', sans-serif; line-height: 1.25;
+  user-select: text;
+  white-space: pre-wrap; word-break: normal; overflow-wrap: anywhere;
+}
+.item .grip {
+  position: absolute; top: -13px; inset-inline-start: -13px;
+  width: 24px; height: 24px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--ink-blue); color: #fff; cursor: move;
+  box-shadow: 0 2px 6px rgba(198, 40, 40,.35);
+  opacity: 0; transition: opacity .12s;
+}
+.item .grip svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.item.kind-image, .item.kind-rect, .item.kind-mark { cursor: move; }
+.item .mark-fill, .item .mark-fill svg { display: block; width: 100%; height: 100%; }
+.item .mark-fill svg { pointer-events: none; overflow: visible; }
+.item:hover .grip, .item.active .grip { opacity: 1; }
+.item .resize {
+  position: absolute; bottom: -7px; inset-inline-end: -7px;
+  width: 13px; height: 13px; border-radius: 3px;
+  background: var(--paper); border: 2px solid var(--ink-blue);
+  cursor: nwse-resize; opacity: 0;
+}
+[dir=rtl] .item .resize { cursor: nesw-resize; }
+.item.active .resize, .item:hover .resize { opacity: 1; }
+
+.item-bar {
+  position: absolute; bottom: calc(100% + 18px); inset-inline-start: -2px;
+  display: flex; align-items: center; gap: 4px;
+  padding: 4px;
+  background: var(--paper);
+  border-radius: var(--r-ctl);
+  box-shadow: var(--shadow-pop);
+  white-space: nowrap; z-index: 4;
+}
+.item-bar .icon-btn { width: 30px; height: 30px; }
+.item-bar .icon-btn svg { width: 17px; height: 17px; }
+.item-bar .sep { width: 1px; height: 20px; background: var(--line); margin: 0 2px; }
+.item-bar .size { min-width: 26px; text-align: center; font-size: var(--fs-s); font-weight: 600; font-variant-numeric: tabular-nums; }
+.item-bar .swatch { width: 20px; height: 20px; }
+.item-bar .icon-btn.on { background: var(--ink-blue-wash); color: var(--ink-blue); }
+.item-bar .del:hover { color: var(--stamp); background: var(--stamp-wash); }
+
+/* שדות טופס על הדף */
+.form-field {
+  position: absolute;
+  background: rgba(198, 40, 40, .07);
+  border: 1px solid rgba(198, 40, 40, .35);
+  border-radius: 2px;
+  padding: 0 3px;
+  font-family: 'Alef', sans-serif;
+  color: var(--ink);
+  user-select: text;
+}
+.form-field:hover { background: rgba(198, 40, 40, .12); }
+.form-field:focus { background: #fff; border-color: var(--ink-blue); outline: none; box-shadow: 0 0 0 3px var(--ink-blue-wash); }
+textarea.form-field { resize: none; padding-top: 2px; line-height: 1.2; }
+input[type=checkbox].form-field { padding: 0; margin: 0; accent-color: var(--ink-blue); background: none; }
+select.form-field { padding: 0 2px; }
+
+/* שדות טופס ברשימה בלוח הצד */
+.field-list { display: flex; flex-direction: column; gap: 2px; max-height: 260px; overflow: auto; margin: 0 -6px; padding: 0 6px; }
+.field-list button {
+  display: flex; justify-content: space-between; gap: 8px;
+  border: 0; background: none; padding: 7px 8px; border-radius: 6px; text-align: start;
+  font-size: var(--fs-s);
+}
+.field-list button:hover { background: var(--line-soft); }
+.field-list .fname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-2); direction: ltr; }
+.field-list .fval { color: var(--ink); font-weight: 500; max-width: 50%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.field-list .fval.none { color: var(--ink-3); font-weight: 400; }
+
+.sig-saved { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.sig-chip {
+  position: relative; height: 62px; padding: 6px;
+  background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-ctl);
+  display: grid; place-items: center;
+}
+.sig-chip img { max-width: 100%; max-height: 100%; }
+.sig-chip:hover { border-color: var(--ink-blue); }
+.sig-chip[aria-pressed="true"] { border-color: var(--ink-blue); box-shadow: 0 0 0 2px var(--ink-blue-wash); }
+.sig-chip .x {
+  position: absolute; top: 3px; inset-inline-end: 3px; width: 20px; height: 20px; border-radius: 50%;
+  border: 0; background: rgba(255,255,255,.9); color: var(--ink-3); display: none; place-items: center; font-size: 15px; line-height: 1;
+}
+.sig-chip:hover .x { display: grid; }
+.sig-chip .x:hover { color: var(--stamp); }
+
+/* ===== תצוגה מקדימה (סימן מים) ===== */
+.preview-wrap { display: flex; flex-wrap: wrap; justify-content: center; gap: 28px; padding: 32px 24px 80px; }
+.preview-wrap .paper canvas { width: 340px; }
+.preview-cap { text-align: center; font-size: var(--fs-s); color: var(--ink-2); margin-top: 10px; }
+
+/* ===== גרירה מבחוץ ===== */
+.drop-veil {
+  position: fixed; inset: 0; z-index: 50;
+  background: rgba(236, 227, 225, .82);
+  backdrop-filter: blur(3px);
+  display: grid; place-items: center;
+  pointer-events: none;
+}
+.drop-sheet {
+  display: grid; justify-items: center; gap: 14px;
+  padding: 40px 56px;
+  background: var(--paper);
+  border: 2px dashed var(--ink-blue);
+  border-radius: var(--r-pop);
+  box-shadow: var(--shadow-pop);
+  font-size: var(--fs-l); font-weight: 500; color: var(--ink-blue-deep);
+}
+.drop-sheet p { margin: 0; }
+.drop-sheet svg { width: 54px; height: 54px; fill: none; stroke: var(--ink-blue); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ===== הודעות ===== */
+.toasts { position: fixed; bottom: 22px; left: 22px; z-index: 60; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.toast {
+  display: flex; align-items: center; gap: 14px;
+  min-width: 280px; max-width: 460px;
+  padding: 12px 14px 12px 12px;
+  background: var(--ink); color: #fff;
+  border-radius: var(--r-ctl);
+  box-shadow: var(--shadow-pop);
+  font-size: var(--fs-m);
+  animation: toast-in .2s ease-out;
+}
+.toast.error { background: var(--stamp); }
+.toast .t-msg { flex: 1; line-height: 1.4; }
+.toast button { background: rgba(255,255,255,.14); color: #fff; border: 0; border-radius: 6px; height: 28px; padding: 0 10px; font-weight: 600; font-size: var(--fs-s); }
+.toast button:hover { background: rgba(255,255,255,.24); }
+@keyframes toast-in { from { opacity: 0; transform: translateY(8px); } }
+@media (prefers-reduced-motion: reduce) { .toast { animation: none; } }
+
+/* ===== חלונות ===== */
+.modal-back {
+  position: fixed; inset: 0; z-index: 40;
+  background: rgba(27, 36, 48, .38);
+  display: grid; place-items: center; padding: 24px;
+}
+.modal {
+  width: min(640px, 100%);
+  background: var(--paper);
+  border-radius: var(--r-pop);
+  box-shadow: var(--shadow-pop);
+  display: flex; flex-direction: column;
+  max-height: calc(100vh - 48px);
+}
+.modal header { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px 0; }
+.modal h2 { margin: 0; font-size: var(--fs-l); font-weight: 600; }
+.modal .body { padding: 16px 22px; overflow: auto; display: flex; flex-direction: column; gap: 14px; }
+.modal footer { display: flex; gap: 10px; justify-content: flex-start; padding: 14px 22px 20px; border-top: 1px solid var(--line-soft); }
+.modal footer .push { margin-inline-start: auto; }
+.modal p { margin: 0; color: var(--ink-2); line-height: 1.6; }
+
+.pad-wrap {
+  position: relative;
+  border-radius: var(--r-ctl);
+  background: #FCFCFB;
+  border: 1px solid var(--line);
+  height: 220px;
+}
+.pad-wrap canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
+.pad-line { position: absolute; inset-inline: 40px; bottom: 56px; border-top: 1px solid var(--line); pointer-events: none; }
+.pad-hint { position: absolute; bottom: 30px; inset-inline-start: 40px; font-size: var(--fs-xs); color: var(--ink-3); pointer-events: none; }
+.pad-tools { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.pad-tools label { display: flex; align-items: center; gap: 8px; font-size: var(--fs-s); color: var(--ink-2); }
+.pad-tools input[type=range] { width: 110px; accent-color: var(--ink-blue); }
+.typed-sig { font-size: 40px; height: 64px; text-align: center; }
+
+.about p + p { margin-top: 4px; }
+.about .ver { font-size: var(--fs-s); color: var(--ink-3); }
+
+/* ===== גלילה ===== */
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-thumb { background: rgba(27,36,48,.22); border-radius: 8px; border: 3px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background-color: rgba(27,36,48,.35); }
+::-webkit-scrollbar-track { background: transparent; }
+
+.busy { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; background: rgba(236,227,225,.55); }
+.busy-card { display: flex; align-items: center; gap: 14px; padding: 16px 22px; background: var(--paper); border-radius: var(--r-pop); box-shadow: var(--shadow-pop); font-weight: 500; }
+.spinner { width: 20px; height: 20px; border-radius: 50%; border: 2.5px solid var(--ink-blue-wash); border-top-color: var(--ink-blue); animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 1180px) {
+  :root { --panel-w: 268px; }
+  .views button { padding: 0 9px; }
+  .brand-name { display: none; }
+  .brand { padding-inline-end: 10px; }
+}
+
+/* ===== סרגל כלים ימני ===== */
+.rail {
+  background: var(--paper);
+  border-inline-end: 1px solid var(--line);
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 10px 8px; gap: 10px;
+  overflow-y: auto;
+}
+.rail-group { display: flex; flex-direction: column; gap: 4px; }
+.rail-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 9px 2px 8px;
+  border: 0; border-radius: 10px; background: none;
+  color: var(--ink-2); font-size: 11.5px; font-weight: 500; line-height: 1.2; text-align: center;
+}
+.rail-btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.rail-btn:hover:not(:disabled) { background: var(--line-soft); color: var(--ink); }
+.rail-btn[aria-pressed="true"] { background: var(--ink-blue-wash); color: var(--ink-blue-deep); font-weight: 600; }
+.rail-btn[aria-pressed="true"] svg { stroke: var(--ink-blue); }
+.rail-btn:disabled { opacity: .35; cursor: default; }
+
+.page-count { color: var(--ink); font-weight: 600; }
+.pages-column { padding-top: 22px; }
+.page-frame .page-label { inset-inline-start: auto; inset-inline-end: calc(100% + 12px); }
+
+.tool-danger:not(:disabled) { color: var(--stamp); }
+.tool-danger:not(:disabled) svg { stroke: var(--stamp); }
+.tool:disabled { opacity: .45; cursor: default; }
+
+/* מיזוג לשוניות */
+.merge-list { display: flex; flex-direction: column; gap: 6px; }
+.merge-item {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px;
+  padding: 10px 12px; border: 1px dashed var(--line); border-radius: var(--r-ctl); background: var(--paper); text-align: start;
+}
+.merge-item:hover { border-color: var(--ink-blue); border-style: solid; }
+.merge-item svg { width: 16px; height: 16px; fill: none; stroke: var(--ink-blue); stroke-width: 2; stroke-linecap: round; }
+.merge-item span { font-weight: 500; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.merge-item small { color: var(--ink-3); font-size: var(--fs-xs); }
+
+/* ===== שילוב ב-Windows ===== */
+.settings { max-width: 760px; margin: 0 auto; padding: 40px 32px 80px; display: flex; flex-direction: column; gap: 20px; }
+.settings h1 { margin: 0; font-size: var(--fs-xl); font-weight: 600; }
+.settings .lead { margin: 0; color: var(--ink-2); font-size: 15px; line-height: 1.65; max-width: 62ch; }
+.cards { display: flex; flex-direction: column; gap: 12px; }
+.card {
+  display: flex; align-items: center; gap: 24px;
+  padding: 20px 22px;
+  background: var(--paper); border-radius: var(--r-pop);
+  box-shadow: var(--shadow-paper);
+}
+.card.on { box-shadow: inset 4px 0 0 var(--ok), var(--shadow-paper); }
+[dir=rtl] .card.on { box-shadow: inset -4px 0 0 var(--ok), var(--shadow-paper); }
+.card-text { flex: 1; min-width: 0; }
+.card h2 { margin: 0 0 6px; font-size: var(--fs-l); font-weight: 600; display: flex; align-items: center; gap: 10px; }
+.card p { margin: 0; color: var(--ink-2); line-height: 1.6; }
+.card p.note { margin-top: 8px; font-size: var(--fs-s); color: var(--ink-3); }
+.pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px 2px 8px; border-radius: 20px; background: #E3F1EA; color: var(--ok); font-size: var(--fs-xs); font-weight: 600; }
+.pill svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.card .btn { flex: none; min-width: 92px; }
+.install-note { font-size: var(--fs-s); color: var(--ink-3); margin: 0; }
+
+/* סרגל הכלים: הכלי הפעיל מסומן בפס זהב, כמו הסרט בלוגו */
+.rail-btn { position: relative; }
+.rail-btn[aria-pressed="true"]::before {
+  content: ''; position: absolute; top: 10px; bottom: 10px; inset-inline-start: -8px;
+  width: 4px; border-radius: 0 4px 4px 0; background: var(--gold);
+}
+[dir=rtl] .rail-btn[aria-pressed="true"]::before { border-radius: 4px 0 0 4px; }
+
+/* מצבי "עמודים" */
+.pages-modes { margin-bottom: -4px; }
+.pages-modes button { height: 32px; font-size: var(--fs-m); }
+.rail-btn:disabled[aria-pressed="true"] { background: none; color: var(--ink-2); font-weight: 500; }
+.rail-btn:disabled[aria-pressed="true"]::before { display: none; }
+.rail-btn:disabled[aria-pressed="true"] svg { stroke: currentColor; }
+
+/* השחרה: בעורך שחור עם פסים עדינים, כדי שיהיה ברור שזה סימון שיבוצע בשמירה */
+.item.kind-redact { cursor: move; }
+.redact-fill {
+  width: 100%; height: 100%;
+  background: repeating-linear-gradient(-45deg, #000 0 7px, #1d1d1d 7px 10px);
+  box-shadow: 0 0 0 1px rgba(142, 36, 18, .7);
+}
+.item.kind-redact.drawing { border: 1px dashed var(--stamp); }
+.item.kind-redact.active { border-color: var(--stamp); }
+
+/* ===== פריסות תצוגה: עמוד יחיד / גלילה רציפה / שני עמודים ===== */
+.pages-column { min-height: 100%; }
+.pages-column.layout-single { justify-content: center; }
+.pages-column.layout-two {
+  display: grid; grid-template-columns: repeat(2, max-content);
+  justify-content: center; align-items: start; gap: 28px 44px;
+}
+
+/* ניווט בין עמודים — צף בתחתית שולחן העבודה */
+.page-nav {
+  position: sticky; bottom: 18px; z-index: 4;
+  width: fit-content; margin: -70px auto 18px;
+  display: flex; align-items: center; gap: 2px;
+  padding: 4px;
+  background: rgba(42, 23, 22, .88);
+  color: #fff;
+  border-radius: 11px;
+  box-shadow: 0 8px 24px -8px rgba(70, 14, 12, .5);
+  backdrop-filter: blur(8px);
+}
+.page-nav .icon-btn { width: 32px; height: 30px; color: rgba(255, 255, 255, .85); }
+.page-nav .icon-btn:hover:not(:disabled) { background: rgba(255, 255, 255, .14); color: #fff; }
+.page-nav .icon-btn:disabled { opacity: .3; }
+.page-nav :focus-visible { outline-color: var(--gold); }
+.page-nav-pos { display: flex; align-items: center; gap: 7px; padding: 0 6px; font-size: var(--fs-s); color: rgba(255, 255, 255, .8); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.page-nav-input {
+  width: 42px; height: 26px; padding: 0 4px;
+  border: 0; border-radius: 6px;
+  background: rgba(255, 255, 255, .14); color: #fff;
+  text-align: center; font-weight: 600; user-select: text;
+}
+.page-nav-input:focus { outline: none; background: rgba(255, 255, 255, .24); box-shadow: 0 0 0 2px var(--gold); }
+
+/* כפתורי V / X בסרגל העיצוב של סימון */
+.item-bar .icon-btn svg path[stroke-width] { stroke-width: 2.6; }
+/* סימון V / X קטן — הידיות יוצאות החוצה כדי לא להסתיר אותו */
+.item.kind-mark .grip { top: calc(50% - 12px); inset-inline-start: -32px; }
+.item.kind-mark .resize { width: 9px; height: 9px; border-width: 1.5px; bottom: -11px; inset-inline-end: -11px; }
+/* ===== עריכת הטקסט הקיים ===== */
+.edit-layer { position: absolute; inset: 0; pointer-events: none; }
+.edit-layer.interactive .tl-hit { pointer-events: auto; }
+.tl-mask { position: absolute; }
+.tl-preview, .tl-editor {
+  position: absolute; display: flex; align-items: flex-start; direction: ltr;
+  transform-origin: 0 0; white-space: pre;
+}
+.tl-preview span, .tl-editor span { display: inline-block; flex: none; white-space: pre; padding: 0 1px; }
+.tl-editor { z-index: 3; }
+.tl-editor span {
+  pointer-events: auto; outline: none; min-width: 1ch; cursor: text;
+  box-shadow: 0 0 0 2px var(--ink-blue), 0 0 0 6px var(--ink-blue-wash); border-radius: 2px;
+  caret-color: var(--ink-blue);
+}
+.tl-hit { position: absolute; border-radius: 3px; cursor: text; z-index: 2; }
+.tl-hit:hover { background: color-mix(in srgb, var(--ink-blue) 8%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink-blue) 55%, transparent); }
+.tl-hit.edited { box-shadow: inset -3px 0 0 var(--ink-blue); }
+[dir=ltr] .tl-hit.edited { box-shadow: inset 3px 0 0 var(--ink-blue); }
+.tl-hit.selected { box-shadow: inset 0 0 0 1.5px var(--ink-blue); }
+
+.tl-style { display: flex; flex-direction: column; gap: 10px; }
+.tl-row { display: flex; align-items: center; gap: 2px; }
+.tl-row .icon-btn { width: 30px; height: 30px; flex: none; }
+.tl-row .icon-btn.on { background: var(--ink-blue-wash); color: var(--ink-blue); }
+.tl-row .sep { width: 1px; height: 20px; background: var(--line); margin: 0 3px; flex: none; }
+.tl-row .size { min-width: 30px; text-align: center; font-size: var(--fs-s); font-weight: 600; font-variant-numeric: tabular-nums; }
+.hint.warn { color: #8a5a00; background: #fff6e0; border-radius: 6px; padding: 8px 10px; }
+.hint kbd { font: inherit; font-size: .85em; padding: 1px 5px; border-radius: 4px; background: var(--line-soft); box-shadow: inset 0 -1px 0 var(--line); }
+.tl-changes { list-style: none; margin: 0 -6px; padding: 0; display: flex; flex-direction: column; gap: 2px; max-height: 320px; overflow: auto; }
+.tl-changes li { display: flex; align-items: center; gap: 4px; }
+.tl-changes .tl-go {
+  flex: 1; min-width: 0; display: flex; gap: 8px; align-items: baseline;
+  border: 0; background: none; padding: 7px 8px; border-radius: 6px; text-align: start; font-size: var(--fs-s);
+}
+.tl-changes .tl-go:hover { background: var(--line-soft); }
+.tl-changes .pg { color: var(--ink-3); white-space: nowrap; font-size: var(--fs-xs); }
+.tl-changes .tx { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); }
+.tl-changes .tx.gone { color: var(--ink-3); text-decoration: line-through; }
+/* ===== אבטחה: סיסמה, הגבלות וחתימה דיגיטלית ===== */
+.asking .busy { display: none; }
+.modal h2.with-icon { display: flex; align-items: center; gap: 8px; }
+.modal h2.with-icon svg, .status-line svg, .sig-row > svg, .cert-chosen > svg { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.form-error { color: var(--stamp) !important; font-size: var(--fs-s); font-weight: 500; }
+.group .sub { display: flex; flex-direction: column; gap: 10px; padding-inline-start: 26px; }
+.group .sub[hidden] { display: none; }
+.status-line { display: flex; align-items: center; gap: 7px; margin: 0; font-size: var(--fs-s); color: var(--ink-blue-deep); background: var(--ink-blue-wash); padding: 7px 10px; border-radius: var(--r-ctl); line-height: 1.45; }
+.strength { margin: -4px 0 0; font-size: var(--fs-xs); font-weight: 600; min-height: 1em; }
+.strength.weak { color: var(--stamp); }
+.strength.medium { color: var(--gold-deep); }
+.strength.strong { color: var(--ok); }
+.perm-list { display: flex; flex-direction: column; gap: 7px; }
+.sig-list { display: flex; flex-direction: column; gap: 8px; }
+.sig-row { display: flex; gap: 9px; align-items: flex-start; padding: 9px 10px; border-radius: var(--r-ctl); border: 1px solid var(--line); background: var(--paper); }
+.sig-row.ok > svg { color: var(--ok); }
+.sig-row.bad { border-color: var(--stamp); background: var(--stamp-wash); }
+.sig-row.bad > svg { color: var(--stamp); }
+.sig-row b { display: block; font-weight: 600; }
+.sig-row small { display: block; color: var(--ink-2); font-size: var(--fs-xs); line-height: 1.5; }
+.sig-row small.st { color: var(--ink); font-weight: 500; }
+.sig-row.bad small.st { color: var(--stamp); }
+.cert-chosen { display: flex; gap: 9px; align-items: center; padding: 9px 10px; border-radius: var(--r-ctl); border: 1px solid var(--ink-blue); background: var(--ink-blue-wash); color: var(--ink-blue-deep); }
+.cert-chosen > div { flex: 1; min-width: 0; }
+.cert-chosen b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cert-chosen small { display: block; font-size: var(--fs-xs); color: var(--ink-2); }
+.cert-pane { display: flex; flex-direction: column; gap: 12px; min-height: 180px; }
+.cert-list { display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow: auto; }
+.cert-item { text-align: start; padding: 9px 12px; border: 1px solid var(--line); border-radius: var(--r-ctl); background: var(--paper); }
+.cert-item:hover { border-color: var(--ink-3); }
+.cert-item[aria-pressed="true"] { border-color: var(--ink-blue); background: var(--ink-blue-wash); }
+.cert-item b { display: block; font-weight: 600; }
+.cert-item small { display: block; color: var(--ink-2); font-size: var(--fs-xs); margin-top: 2px; }
+.file-pick { display: flex; align-items: center; gap: 10px; }
+.file-pick .file-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 7px 10px; border: 1px dashed var(--line); border-radius: var(--r-ctl); color: var(--ink-2); font-size: var(--fs-s); text-align: right; }
+.recent { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; font-size: var(--fs-s); color: var(--ink-3); }
+.link { border: 0; background: none; padding: 0; color: var(--ink-blue); font-size: var(--fs-s); text-decoration: underline; cursor: pointer; }
+.placing-hint { color: var(--ink-blue-deep) !important; font-weight: 500; }
+.item.kind-digisig { cursor: move; }
+.digisig-box { display: flex; align-items: center; gap: 4%; width: 100%; height: 100%; padding: 4px 6px; border: 1px solid #1F35B5; background: rgba(255,255,255,.85); color: #1F35B5; font-family: 'Alef', sans-serif; line-height: 1.25; overflow: hidden; direction: rtl; }
+.digisig-box img { width: auto !important; max-width: 40%; height: auto !important; max-height: 90%; order: 2; }
+.digisig-lines { flex: 1; min-width: 0; text-align: right; }
+.digisig-lines div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ===== הדפסה ===== */
+.print-btn {
+  width: 38px; height: 34px;
+  display: inline-grid; place-items: center;
+  border: 0; border-radius: 9px;
+  background: var(--panel); color: var(--ink-2);
+  box-shadow: inset 0 0 0 1px var(--line-soft);
+}
+.print-btn svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.print-btn:hover:not(:disabled) { background: var(--line-soft); color: var(--ink); }
+.print-btn:disabled { opacity: .35; cursor: default; }
+#print-root { display: none; }
+@media print {
+  body { display: block !important; overflow: visible !important; background: #fff !important; height: auto !important; }
+  body > *:not(#print-root) { display: none !important; }
+  #print-root { display: block !important; }
+  .print-page { width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; break-after: page; page-break-after: always; overflow: hidden; }
+  .print-page:last-child { break-after: auto; page-break-after: auto; }
+  .print-page img { max-width: 100%; max-height: 100%; object-fit: contain; }
+}
+
+/* שם המותג: PDF כתווית זהובה קופצת */
+.brand-name { gap: 5px; align-items: center; }
+.brand-name .pdf {
+  display: inline-block;
+  background: linear-gradient(#FFC94A, #F0A01A);
+  color: var(--navy) !important;
+  font-weight: 800; font-size: 11.5px; letter-spacing: .5px; line-height: 1;
+  padding: 3px 6px 3px; border-radius: 5px;
+  transform: rotate(-8deg) translateY(-1px);
+  box-shadow: 0 2px 4px rgba(40, 6, 5, .3), inset 0 0 0 1px rgba(255,255,255,.5);
+}

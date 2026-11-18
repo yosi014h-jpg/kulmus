@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; script-src 'self'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self' data: blob:">
+  <title>קולמוס PDF</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand" aria-label="קולמוס PDF">
+      <img class="brand-logo" src="logo.png" alt="">
+      <span class="brand-name">קולמוס<span class="pdf">PDF</span></span>
+    </div>
+
+    <div class="tabs" id="tabs" role="tablist" aria-label="קבצים פתוחים"></div>
+
+    <div class="top-actions">
+      <div class="view-ctl" id="view-ctl" role="toolbar" aria-label="תצוגה" hidden></div>
+      <button class="print-btn" id="btn-print" title="הדפסה (Ctrl+P)" aria-label="הדפסה" disabled>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V3h10v6"/><path d="M7 17H4v-7h16v7h-3"/><path d="M7 14h10v7H7z"/></svg>
+      </button>
+      <button class="save-btn" id="btn-save" title="שמירה (Ctrl+S)" aria-label="שמירה" disabled>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h11l3 3v15H5z"/><path d="M8 3v5h7V3M8 21v-7h8v7"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <nav class="rail" id="rail" aria-label="כלים"></nav>
+    <section class="desk" id="desk" tabindex="-1"></section>
+    <aside class="panel" id="panel" aria-label="אפשרויות הכלי"></aside>
+  </main>
+
+  <div class="drop-veil" id="drop-veil" hidden>
+    <div class="drop-sheet">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M12 6h18l8 8v28H12z"/><path d="M30 6v8h8"/><path d="M25 20v14M19 28l6 6 6-6"/></svg>
+      <p>שחררו כאן כדי להוסיף את הקבצים</p>
+    </div>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+  <div class="modal-root" id="modal-root"></div>
+
+  <script src="../../node_modules/pdf-lib/dist/pdf-lib.min.js"></script>
+  <script src="../../node_modules/@pdf-lib/fontkit/dist/fontkit.umd.min.js"></script>
+  <script src="../../node_modules/bidi-js/dist/bidi.min.js"></script>
+  <script src="../core/hebrew.js"></script>
+  <script src="../core/textedit.js"></script>
+  <script src="../core/ops.js"></script>
+  <script type="module" src="app.js"></script>
+  <div id="print-root" aria-hidden="true"></div>
+</body>
+</html>
