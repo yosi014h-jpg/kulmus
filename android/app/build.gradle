@@ -20,19 +20,23 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
-    // חתימה קבועה, כדי שגרסה חדשה תותקן מעל הקודמת.
-    // אפשר להחליף במפתח פרטי דרך משתני הסביבה KULMUS_KEYSTORE / KULMUS_KEYSTORE_PASSWORD.
+    // חתימה: המפתח הפרטי לא נמצא במאגר. ב-GitHub הוא נשמר בסודות (Secrets) ונפתח בזמן הבנייה
+    // לקובץ זמני שמועבר כאן במשתני הסביבה. בלי מפתח (בנייה מקומית או ענף בדיקה) נחתם במפתח הבדיקה.
+    def ksPath = System.getenv('KULMUS_KEYSTORE')
+    def hasKey = ksPath && file(ksPath).exists()
     signingConfigs {
-        release {
-            storeFile file(System.getenv('KULMUS_KEYSTORE') ?: '../kulmus-release.jks')
-            storePassword System.getenv('KULMUS_KEYSTORE_PASSWORD') ?: 'kulmus-pdf'
-            keyAlias System.getenv('KULMUS_KEY_ALIAS') ?: 'kulmus'
-            keyPassword System.getenv('KULMUS_KEYSTORE_PASSWORD') ?: 'kulmus-pdf'
+        if (hasKey) {
+            release {
+                storeFile file(ksPath)
+                storePassword System.getenv('KULMUS_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('KULMUS_KEY_ALIAS') ?: 'kulmus'
+                keyPassword System.getenv('KULMUS_KEYSTORE_PASSWORD')
+            }
         }
     }
     buildTypes {
         release {
-            signingConfig signingConfigs.release
+            signingConfig hasKey ? signingConfigs.release : signingConfigs.debug
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

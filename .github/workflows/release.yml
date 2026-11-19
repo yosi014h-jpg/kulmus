@@ -80,13 +80,24 @@ jobs:
           java-version: 21
 
       - name: Build APK
+        env:
+          KULMUS_KEYSTORE_B64: ${{ secrets.KULMUS_KEYSTORE_B64 }}
+          KULMUS_KEYSTORE_PASSWORD: ${{ secrets.KULMUS_KEYSTORE_PASSWORD }}
         run: |
+          # המפתח הפרטי מגיע רק מהסודות של המאגר; בלי מפתח לא מפרסמים APK
+          if [ -z "$KULMUS_KEYSTORE_B64" ] || [ -z "$KULMUS_KEYSTORE_PASSWORD" ]; then
+            echo "::error::חסרים הסודות KULMUS_KEYSTORE_B64 / KULMUS_KEYSTORE_PASSWORD (Settings → Secrets and variables → Actions)"
+            exit 1
+          fi
+          export KULMUS_KEYSTORE="$RUNNER_TEMP/kulmus.jks"
+          echo "$KULMUS_KEYSTORE_B64" | base64 -d > "$KULMUS_KEYSTORE"
           npm ci
           npm run build:android
           cd android && ./gradlew assembleRelease --no-daemon
           cd ..
           cp android/app/build/outputs/apk/release/app-release.apk dist/KulmusPDF.apk
           cp android/app/build/outputs/apk/release/app-release.apk "dist/KulmusPDF-${{ needs.build.outputs.version }}.apk"
+          rm -f "$KULMUS_KEYSTORE"
 
       - name: Add to release
         uses: softprops/action-gh-release@v2
