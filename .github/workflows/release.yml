@@ -57,7 +57,8 @@ jobs:
           target_commitish: ${{ github.sha }}
           name: קולמוס PDF ${{ steps.v.outputs.version }}
           make_latest: true
-          generate_release_notes: true
+          # הערות אוטומטיות כבוי: יצירתן נכשלה בשגיאת שרת 500 של GitHub
+          body: "קולמוס PDF ${{ steps.v.outputs.version }} — Windows (KulmusPDF-Setup-x64.exe) ואנדרואיד (KulmusPDF.apk)."
           files: |
             dist/KulmusPDF-Setup-x64.exe
             dist/KulmusPDF-Setup-${{ steps.v.outputs.version }}-x64.exe
