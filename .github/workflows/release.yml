@@ -1,4 +1,5 @@
 # בונה את תוכנת ההתקנה ומפרסם אותה ב-Releases בכל פעם שמספר הגרסה ב-package.json משתנה.
+# אם הפרסום נכשל בשגיאת שרת זמנית של GitHub — שינוי בקובץ הזה מריץ אותו מחדש.
 # הקישורים הקבועים להורדה של הגרסה האחרונה:
 #   https://github.com/yosi014h-jpg/kulmus/releases/latest/download/KulmusPDF-Setup-x64.exe
 #   https://github.com/yosi014h-jpg/kulmus/releases/latest/download/KulmusPDF.apk
