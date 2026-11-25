@@ -188,6 +188,7 @@
   const api = {
     platform: 'web',
     isWeb: true,
+    isApp: !!NATIVE, // אפליקציית אנדרואיד
     canShowFolder: false,
 
     openPdfs: () => pick(PDF, PDF_MIME, true),

@@ -1846,7 +1846,7 @@ async function about() {
       <header><h2 id="ab-t">קולמוס PDF</h2><button class="icon-btn" aria-label="סגירה">${icon('x')}</button></header>
       <div class="body">
         <p class="ver">גרסה ${esc(v)}</p>
-        <p>${api.isWeb ? 'כלי חינמי בקוד פתוח לעבודה עם קבצי PDF בעברית. כל העיבוד נעשה בדפדפן שלכם, והקבצים לא עולים לשום שרת.' : 'תוכנה חינמית בקוד פתוח לעבודה עם קבצי PDF בעברית. כל העיבוד נעשה על המחשב שלכם, בלי אינטרנט ובלי להעלות קבצים.'}</p>
+        <p>${api.isApp ? 'אפליקציה חינמית בקוד פתוח לעבודה עם קבצי PDF בעברית. כל העיבוד נעשה בטלפון שלכם, בלי אינטרנט ובלי להעלות קבצים.' : api.isWeb ? 'כלי חינמי בקוד פתוח לעבודה עם קבצי PDF בעברית. כל העיבוד נעשה בדפדפן שלכם, והקבצים לא עולים לשום שרת.' : 'תוכנה חינמית בקוד פתוח לעבודה עם קבצי PDF בעברית. כל העיבוד נעשה על המחשב שלכם, בלי אינטרנט ובלי להעלות קבצים.'}</p>
         <p>קוד פתוח ברישיון MIT. מבוסס בין השאר על PDF Fusion Master (isrgold).</p>
         <p>בנויה על pdf.js, pdf-lib ו-bidi-js. גופנים: Alef ו-IBM Plex Sans Hebrew (רישיון OFL).</p>
       </div>
@@ -2223,7 +2223,7 @@ function renderEmpty() {
           <button class="btn btn-primary btn-lg" data-act="open">פתיחת קבצים</button>
           <button class="btn btn-quiet btn-lg" data-act="images">${icon('image')}תמונות ל-PDF</button>
         </div>
-        <p class="empty-note">${api.isWeb ? 'הקבצים לא עולים לשום מקום. הכל קורה בדפדפן שלכם.' : 'הקבצים לא עולים לשום מקום. התוכנה עובדת גם בלי אינטרנט.'}</p>
+        <p class="empty-note">${api.isApp ? 'הקבצים לא עולים לשום מקום. הכל קורה בטלפון שלכם, גם בלי אינטרנט.' : api.isWeb ? 'הקבצים לא עולים לשום מקום. הכל קורה בדפדפן שלכם.' : 'הקבצים לא עולים לשום מקום. התוכנה עובדת גם בלי אינטרנט.'}</p>
       </div>
     </div>`);
   el.querySelector('[data-act=open]').onclick = openDialog;
@@ -3282,6 +3282,59 @@ function wire() {
     if (e.deltaY > 0 && atBottom && D().curPage < S.pages.length - 1) { lastFlip = now; goToPage(D().curPage + 1); }
     else if (e.deltaY < 0 && atTop && D().curPage > 0) { lastFlip = now; goToPage(D().curPage - 1, true); }
   }, { passive: true });
+
+  // צביטה בשתי אצבעות (טלפון וטאבלט): זום במסמך עצמו, לא בכל הממשק.
+  // בזמן הצביטה מגדילים בתצוגה בלבד (transform), ובסיום מציירים מחדש בגודל החדש.
+  let pinch = null;
+  const dist = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+  deskEl.addEventListener('touchstart', (e) => {
+    if (e.touches.length !== 2 || !D() || !S.pages.length) return;
+    const column = PAGE_COLUMN_TOOLS.has(S.tool);
+    if (!column && S.tool !== 'pages') return;
+    const target = deskEl.querySelector(column ? '.pages-column' : '.grid, .thumbs, .sheets') || deskEl.firstElementChild;
+    if (!target) return;
+    const fx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+    const fy = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+    // עוגן: העמוד שמתחת לאצבעות (העמודה עצמה ברוחב קבוע, ולכן לא מתאימה למדידה)
+    const ANCHOR = column ? '.page-frame' : '.sheet';
+    const hit = document.elementFromPoint(fx, fy);
+    const anchorEl = (hit && hit.closest(ANCHOR)) || deskEl.querySelector(ANCHOR) || target;
+    const anchorIdx = [...deskEl.querySelectorAll(ANCHOR)].indexOf(anchorEl);
+    const tr = anchorEl.getBoundingClientRect();
+    const tt = target.getBoundingClientRect();
+    const frame = deskEl.querySelector('.page-frame');
+    const base = column ? (typeof S.zoom === 'number' ? S.zoom : frame && frame.__ctx ? frame.__ctx.scale : 1) : S.thumbW;
+    // מיקום הנקודה שבין האצבעות, יחסית לתוכן (בלי scrollLeft — בעברית הוא שלילי)
+    pinch = { d0: dist(e.touches), f: 1, base, column, fx, fy, rx: (fx - tr.left) / tr.width, ry: (fy - tr.top) / tr.height, target, ANCHOR, anchorIdx };
+    target.style.transformOrigin = `${fx - tt.left}px ${fy - tt.top}px`;
+  }, { passive: true });
+  deskEl.addEventListener('touchmove', (e) => {
+    if (!pinch || e.touches.length !== 2) return;
+    e.preventDefault();
+    const lo = pinch.column ? 0.3 / pinch.base : 110 / pinch.base;
+    const hi = pinch.column ? 4 / pinch.base : 300 / pinch.base;
+    pinch.f = Math.max(lo, Math.min(hi, dist(e.touches) / pinch.d0));
+    pinch.target.style.transform = `scale(${pinch.f})`;
+  }, { passive: false });
+  const endPinch = () => {
+    if (!pinch) return;
+    const p = pinch;
+    pinch = null;
+    p.target.style.transform = '';
+    p.target.style.transformOrigin = '';
+    if (Math.abs(p.f - 1) < 0.03) return;
+    if (p.column) S.zoom = Math.round(p.base * p.f * 100) / 100;
+    else { S.thumbW = Math.round(p.base * p.f); localStore('thumbW', String(S.thumbW)); }
+    render();
+    // הנקודה שהייתה בין האצבעות נשארת במקומה
+    const t2 = p.anchorIdx >= 0 ? deskEl.querySelectorAll(p.ANCHOR)[p.anchorIdx] : null;
+    if (t2) {
+      const r2 = t2.getBoundingClientRect();
+      deskEl.scrollBy(r2.left + p.rx * r2.width - p.fx, r2.top + p.ry * r2.height - p.fy);
+    }
+  };
+  deskEl.addEventListener('touchend', (e) => { if (e.touches.length < 2) endPinch(); });
+  deskEl.addEventListener('touchcancel', endPinch);
 
   // בקשות פתיחה מבחוץ: לחיצה כפולה על קובץ, קליק ימני (פתיחה/מיזוג/פיצול)
   api.onOpenRequest(async ({ mode, paths }) => {

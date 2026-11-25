@@ -12,6 +12,10 @@
   .topbar { gap: 8px; padding: 0 8px; }
   .brand { border: 0; padding: 0; }
   .views, .ctl-sep { display: none !important; }
+  /* בטלפון אין מקום לכל הסרגל: פריסת עמודים ו-+/− יורדים (זום — בצביטה), נשארים "התאמה" והאחוז */
+  .view-ctl [role=radiogroup], .view-ctl [data-z="in"], .view-ctl [data-z="out"] { display: none !important; }
+  .top-actions { gap: 6px; }
+  .topbar { min-width: 0; max-width: 100vw; }
   .zoom-val { min-width: 36px; }
 
   .workspace,
@@ -45,4 +49,9 @@
 
   .empty h1 { font-size: 22px; }
   .modal { max-height: 92vh; overflow-y: auto; }
+}
+
+/* טלפון צר מאוד: מפנים מקום לשם הקובץ */
+@media (max-width: 380px) {
+  .view-ctl [data-z="page"], .about-btn { display: none !important; }
 }
