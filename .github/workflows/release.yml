@@ -65,7 +65,8 @@ jobs:
   # אפליקציית אנדרואיד (APK) — נבנית אחרי Windows ומתווספת לאותו Release.
   build-android:
     needs: build
-    if: needs.build.outputs.exists == 'false'
+    # רץ גם אם העלאת Windows נכשלה (שגיאת שרת), כדי שקישור ה-APK לא יישבר
+    if: always() && needs.build.outputs.exists == 'false'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
