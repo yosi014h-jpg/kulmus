@@ -59,9 +59,8 @@ jobs:
           make_latest: true
           # הערות אוטומטיות כבוי: יצירתן נכשלה בשגיאת שרת 500 של GitHub
           body: "קולמוס PDF ${{ steps.v.outputs.version }} — Windows (KulmusPDF-Setup-x64.exe) ואנדרואיד (KulmusPDF.apk)."
-          files: |
-            dist/KulmusPDF-Setup-x64.exe
-            dist/KulmusPDF-Setup-${{ steps.v.outputs.version }}-x64.exe
+          # קובץ אחד בלבד (כ-117MB): העלאה כפולה של אותו קובץ נכשלה בשרתי GitHub
+          files: dist/KulmusPDF-Setup-x64.exe
 
   # אפליקציית אנדרואיד (APK) — נבנית אחרי Windows ומתווספת לאותו Release.
   build-android:
